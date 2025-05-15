@@ -8,8 +8,21 @@ generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
-
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  records   Record[]
+}
+model Record {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime
+  meal      String
+  calories  Int
 }
