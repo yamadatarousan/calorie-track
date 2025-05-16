@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 type Record = {
   id: number;
@@ -41,6 +42,7 @@ export default function RecordsPage() {
               <th className="border p-2 text-left">食事名</th>
               <th className="border p-2 text-left">カロリー (kcal)</th>
               <th className="border p-2 text-left">日時</th>
+              <th className="border p-2 text-left">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -57,17 +59,25 @@ export default function RecordsPage() {
                     minute: "2-digit",
                   })}
                 </td>
+                <td className="border p-2">
+                  <Link
+                    href={`/records/${record.id}/edit`}
+                    className="text-indigo-600 hover:underline"
+                  >
+                    編集
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-      <a
+      <Link
         href="/records/new"
         className="mt-4 inline-block bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
       >
         新しい記録を追加
-      </a>
+      </Link>
     </div>
   );
 }
