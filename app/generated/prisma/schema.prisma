@@ -15,10 +15,11 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  name    String?
-  records Record[]
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String?
+  records   Record[]
+  exercises Exercise[]
 }
 
 model Record {
@@ -27,5 +28,14 @@ model Record {
   user     User     @relation(fields: [userId], references: [id])
   date     DateTime
   meal     String
+  calories Int
+}
+
+model Exercise {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  date     DateTime
+  name     String
   calories Int
 }

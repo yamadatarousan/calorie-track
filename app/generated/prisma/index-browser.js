@@ -134,6 +134,14 @@ exports.Prisma.RecordScalarFieldEnum = {
   calories: 'calories'
 };
 
+exports.Prisma.ExerciseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  name: 'name',
+  calories: 'calories'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -153,10 +161,15 @@ exports.Prisma.RecordOrderByRelevanceFieldEnum = {
   meal: 'meal'
 };
 
+exports.Prisma.ExerciseOrderByRelevanceFieldEnum = {
+  name: 'name'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Record: 'Record'
+  Record: 'Record',
+  Exercise: 'Exercise'
 };
 
 /**
