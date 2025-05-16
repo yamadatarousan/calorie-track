@@ -8,6 +8,9 @@ export default function Navbar() {
           Calorie Track
         </Link>
         <div className="space-x-4">
+          <Link href="/dashboard" className="hover:underline">
+            ダッシュボード
+          </Link>
           <Link href="/records" className="hover:underline">
             記録一覧
           </Link>
