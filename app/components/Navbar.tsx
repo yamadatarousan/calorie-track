@@ -17,6 +17,9 @@ export default function Navbar() {
           <Link href="/records/new" className="hover:underline">
             新規記録
           </Link>
+          <Link href="/exercises" className="hover:underline">
+            運動一覧
+          </Link>
           <Link href="/exercises/new" className="hover:underline">
             運動記録
           </Link>

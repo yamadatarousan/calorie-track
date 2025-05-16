@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export async function GET() {
+    try {
+      const exercises = await prisma.exercise.findMany({
+        where: { userId: 1 }, // 仮の userId
+        orderBy: { date: "desc" },
+      });
+      return NextResponse.json(exercises);
+    } catch (error) {
+      return NextResponse.json({ error: "サーバーエラー" }, { status: 500 });
+    }
+}  
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
