@@ -3,10 +3,11 @@ import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // 過去7日間の日付を基準に
+    // 当月の範囲を計算（例：2025-05-01 ～ 2025-05-31）
     const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(endDate.getDate() - 6); // 7日間
+    const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); // 月初
+    endDate.setMonth(endDate.getMonth() + 1); // 翌月
+    endDate.setDate(0); // 月末
 
     // Record から日別の摂取カロリーを集計
     const records = await prisma.record.groupBy({
