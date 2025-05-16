@@ -26,3 +26,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "サーバーエラー" }, { status: 500 });
   }
 }
+
+export async function GET() {
+    try {
+      const records = await prisma.record.findMany({
+        where: { userId: 1 }, // 仮の userId
+        orderBy: { date: "desc" },
+      });
+      return NextResponse.json(records);
+    } catch (error) {
+      return NextResponse.json({ error: "サーバーエラー" }, { status: 500 });
+    }
+}
