@@ -50,3 +50,19 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "サーバーエラー" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id") || request.nextUrl.pathname.split("/").pop();
+    if (!id) {
+      return NextResponse.json({ error: "IDが指定されていません" }, { status: 400 });
+    }
+    await prisma.record.delete({
+      where: { id: parseInt(id) },
+    });
+    return NextResponse.json({ message: "削除しました" });
+  } catch (error) {
+    return NextResponse.json({ error: "サーバーエラー" }, { status: 500 });
+  }
+}

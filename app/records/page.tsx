@@ -29,6 +29,19 @@ export default function RecordsPage() {
     fetchRecords();
   }, []);
 
+  async function handleDelete(id: number) {
+    if (!confirm("この記録を削除しますか？")) return;
+    try {
+      const response = await fetch(`/api/records/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("削除に失敗しました");
+      setRecords(records.filter((record) => record.id !== id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "エラーが発生しました");
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">食事記録一覧</h1>
@@ -59,13 +72,19 @@ export default function RecordsPage() {
                     minute: "2-digit",
                   })}
                 </td>
-                <td className="border p-2">
+                <td className="border p-2 space-x-2">
                   <Link
                     href={`/records/${record.id}/edit`}
                     className="text-indigo-600 hover:underline"
                   >
                     編集
                   </Link>
+                  <button
+                    onClick={() => handleDelete(record.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    削除
+                  </button>
                 </td>
               </tr>
             ))}
