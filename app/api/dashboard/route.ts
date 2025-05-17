@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import pino from "pino";
+
+const logger = pino({ level: "debug" });
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,27 +20,32 @@ export async function GET(request: NextRequest) {
       endDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0);
     }
 
-    // 摂取カロリー（Record）
-    const records = await prisma.record.groupBy({
-      by: ["date"],
-      where: {
-        userId: 1,
-        date: { gte: startDate, lte: endDate },
-      },
-      _sum: { calories: true },
-    });
+    // 日付（YYYY-MM-DD）でグループ化してカロリー合計
+    const records = await prisma.$queryRaw<
+      Array<{ date: string; totalCalories: number }>
+    >`
+      SELECT DATE_FORMAT(date, '%Y-%m-%d') as date, SUM(calories) as totalCalories
+      FROM Record
+      WHERE userId = 1
+      AND date >= ${startDate}
+      AND date <= ${endDate}
+      GROUP BY DATE_FORMAT(date, '%Y-%m-%d')
+    `;
+    logger.debug("Fetched records", { records });
 
-    // 消費カロリー（Exercise）
-    const exercises = await prisma.exercise.groupBy({
-      by: ["date"],
-      where: {
-        userId: 1,
-        date: { gte: startDate, lte: endDate },
-      },
-      _sum: { calories: true },
-    });
+    const exercises = await prisma.$queryRaw<
+      Array<{ date: string; totalCalories: number }>
+    >`
+      SELECT DATE_FORMAT(date, '%Y-%m-%d') as date, SUM(calories) as totalCalories
+      FROM Exercise
+      WHERE userId = 1
+      AND date >= ${startDate}
+      AND date <= ${endDate}
+      GROUP BY DATE_FORMAT(date, '%Y-%m-%d')
+    `;
+    logger.debug("Fetched exercises", { exercises });
 
-    // 日付ごとにカロリー整理
+    // 日付ごとのカロリー整理
     const intakeCalories: { [key: string]: number } = {};
     const burnedCalories: { [key: string]: number } = {};
     const labels: string[] = [];
@@ -49,14 +57,14 @@ export async function GET(request: NextRequest) {
     }
 
     records.forEach((record) => {
-      const dateStr = new Date(record.date).toISOString().split("T")[0];
-      intakeCalories[dateStr] = record._sum.calories || 0;
+      intakeCalories[record.date] = Number(record.totalCalories) || 0;
     });
 
     exercises.forEach((exercise) => {
-      const dateStr = new Date(exercise.date).toISOString().split("T")[0];
-      burnedCalories[dateStr] = exercise._sum.calories || 0;
+      burnedCalories[exercise.date] = Number(exercise.totalCalories) || 0;
     });
+
+    logger.info("Dashboard data prepared", { labels, intake: Object.values(intakeCalories).slice(0, 5) });
 
     return NextResponse.json({
       labels,
@@ -64,6 +72,7 @@ export async function GET(request: NextRequest) {
       burned: Object.values(burnedCalories),
     });
   } catch (error) {
+    logger.error("Server error", { error: error.message });
     return NextResponse.json({ error: "サーバーエラー" }, { status: 500 });
   }
 }
